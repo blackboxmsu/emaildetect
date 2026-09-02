@@ -15,7 +15,7 @@ export const ForensicReportModal = ({
   const { risk, parsedEmail, headers, authentication, earliestReliableGeo, chainOfCustody, iocs } = report;
 
   return (
-    <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
       <div className="w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-white text-slate-900 rounded-xl shadow-2xl flex flex-col">
         {/* Modal Controls (Not printed) */}
         <div className="p-3.5 px-6 bg-slate-900 text-white flex items-center justify-between rounded-t-xl print:hidden">

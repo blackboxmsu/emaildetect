@@ -28,10 +28,10 @@ export const GeoMap = ({ hops = [], earliestReliableGeo }) => {
 
     mapInstanceRef.current = map;
 
-    // Clean Dark carto tile layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-      subdomains: 'abcd'
+    // Clean Dark Map Tiles (no API key required, crisp and dark)
+    L.tileLayer('https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 16,
+      attribution: 'Esri, HERE, Garmin, © OpenStreetMap'
     }).addTo(map);
 
     const latLngs = [];
@@ -170,8 +170,8 @@ export const GeoMap = ({ hops = [], earliestReliableGeo }) => {
         )}
       </div>
 
-      <div className="h-80 w-full rounded-md overflow-hidden border border-slate-800">
-        <div ref={mapContainerRef} className="w-full h-full" />
+      <div className="h-80 w-full rounded-md overflow-hidden border border-slate-800 relative z-0 isolate">
+        <div ref={mapContainerRef} className="w-full h-full relative z-0" />
       </div>
 
       {/* Legend */}

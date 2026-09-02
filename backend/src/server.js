@@ -232,16 +232,14 @@ async function persistCase(report) {
 async function start() {
   await connectDB();
   const server = app.listen(PORT, () => {
-    console.log(`[Backend] Email Forensics API Server listening on http://localhost:${PORT}`);
-    console.log(`[Backend] Running with Node.js (JavaScript) and Python AI Engine`);
+    console.log(`✔ Backend server running on port: ${PORT}`);
   });
 
   server.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
-      console.error(`\n[Backend Error] Port ${PORT} is already in use by another running process.`);
-      console.error(`Please stop the previous process or change PORT in backend/.env (e.g., PORT=5001).\n`);
+      console.error(`✖ Port ${PORT} is already in use.`);
     } else {
-      console.error('[Backend Error]:', err.message);
+      console.error(`✖ Server error: ${err.message}`);
     }
   });
 }

@@ -33,7 +33,7 @@ export const SamplePickerModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-[9999] p-4">
       <div className="panel w-full max-w-2xl max-h-[88vh] overflow-y-auto bg-slate-900 border border-slate-700 rounded-lg shadow-2xl">
         {/* Header */}
         <div className="p-4 px-5 border-b border-slate-800 flex items-center justify-between">
