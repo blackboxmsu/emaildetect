@@ -22,46 +22,46 @@ export const CaseHistoryModal = ({
   });
 
   return (
-    <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-[9999] p-4">
-      <div className="panel w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-slate-900 border border-slate-700 rounded-lg shadow-2xl">
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+      <div className="panel w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-white border border-slate-300 rounded-xl shadow-2xl">
         {/* Header */}
-        <div className="p-4 px-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="p-4 px-6 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-xl">
           <div>
-            <h2 className="text-base font-semibold text-slate-100 flex items-center gap-1.5 m-0">
-              <FolderArchive className="w-4 h-4 text-cyan-400" />
-              Case History & Management
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2 m-0">
+              <FolderArchive className="w-5 h-5 text-blue-600" />
+              Case Management & History
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Archive of previously investigated email cases and campaigns.
+            <p className="text-xs text-slate-500 mt-0.5">
+              Searchable archive of investigated email cases and campaigns (P7 Requirement).
             </p>
           </div>
           <button
             onClick={onClose}
-            className="bg-transparent border-0 text-slate-400 hover:text-white cursor-pointer"
+            className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition cursor-pointer"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Search */}
-        <div className="p-3 px-5 border-b border-slate-800 bg-slate-950/60">
-          <div className="flex items-center gap-2 bg-slate-900 py-1.5 px-2.5 rounded border border-slate-700">
-            <Search className="w-3.5 h-3.5 text-slate-500" />
+        <div className="p-3 px-6 border-b border-slate-200 bg-slate-100/60">
+          <div className="flex items-center gap-2 bg-white py-2 px-3 rounded-lg border border-slate-300 shadow-sm">
+            <Search className="w-4 h-4 text-slate-400" />
             <input
               type="text"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              placeholder="Search by Case ID, domain, threat, or subject..."
-              className="bg-transparent border-0 outline-none text-slate-100 text-xs w-full"
+              placeholder="Search by Case ID, subject, sender, or threat pattern..."
+              className="bg-transparent border-0 outline-none text-slate-900 text-xs w-full"
             />
           </div>
         </div>
 
         {/* Cases List */}
-        <div className="p-4 px-5 flex flex-col gap-2.5">
+        <div className="p-5 px-6 flex flex-col gap-3">
           {filteredCases.length === 0 ? (
-            <div className="text-center py-8 text-slate-500 text-xs">
-              No cases recorded yet.
+            <div className="text-center py-10 text-slate-500 text-xs">
+              No investigated cases found matching your search.
             </div>
           ) : (
             filteredCases.map(c => {
@@ -72,36 +72,35 @@ export const CaseHistoryModal = ({
               return (
                 <div
                   key={c.caseId}
-                  className={`panel panel-interactive p-3 px-3.5 border-l-4 rounded bg-slate-950/40 border border-slate-800 hover:border-slate-700 cursor-pointer transition ${
-                    isCrit ? 'border-l-rose-500' : (isHigh ? 'border-l-amber-500' : 'border-l-emerald-500')
+                  className={`p-3.5 px-4 border rounded-lg hover:border-blue-400 hover:shadow-md cursor-pointer transition bg-white ${
+                    isCrit ? 'border-l-4 border-l-red-500' : (isHigh ? 'border-l-4 border-l-amber-500' : 'border-l-4 border-l-emerald-500')
                   }`}
                   onClick={() => onSelectCase(c)}
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <span className="font-mono text-[11px] text-cyan-400 font-semibold">
+                      <span className="font-mono text-xs text-blue-700 font-bold">
                         {c.caseId}
                       </span>
-                      <div className="text-xs font-semibold text-slate-100 mt-0.5">
+                      <div className="text-xs font-bold text-slate-900 mt-0.5">
                         {c.subject || c.parsedEmail?.subject || 'No Subject'}
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                       <span className={`badge ${isCrit ? 'badge-critical' : (isHigh ? 'badge-warning' : 'badge-safe')}`}>
                         Score: {score}/100
                       </span>
-                      <ArrowUpRight className="w-3.5 h-3.5 text-slate-500" />
+                      <ArrowUpRight className="w-4 h-4 text-slate-400" />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3.5 text-[11px] text-slate-400 mt-1.5 flex-wrap">
-                    <div>Threat: <span className="text-slate-200">{c.classification?.primaryThreat || 'Unclassified'}</span></div>
-                    <div>Sender: <span className="text-slate-300 font-mono">{c.sender?.email || c.parsedEmail?.from?.address || 'Unknown'}</span></div>
-                    {c.analyzedAt && (
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        <span>{new Date(c.analyzedAt).toLocaleDateString()}</span>
+                  <div className="flex items-center gap-4 text-xs text-slate-600 mt-2 flex-wrap">
+                    <div>Threat: <strong className="text-slate-900">{c.classification?.primaryThreat || 'Unclassified'}</strong></div>
+                    <div>Sender: <span className="text-slate-700 font-mono">{c.sender?.email || c.parsedEmail?.from?.address || 'Unknown'}</span></div>
+                    {c.createdAt && (
+                      <div className="text-slate-400 text-[11px] ml-auto">
+                        {new Date(c.createdAt).toLocaleDateString()}
                       </div>
                     )}
                   </div>

@@ -179,18 +179,18 @@ export function App() {
 
       {/* Error Alert */}
       {error && (
-        <div className="mb-4 p-3.5 px-4 bg-rose-500/10 border border-rose-500/30 rounded-md flex items-center gap-2.5 text-rose-300 text-xs">
-          <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+        <div className="mb-4 p-3.5 px-4 bg-red-50 border border-red-200 rounded-md flex items-center gap-2.5 text-red-800 text-xs">
+          <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Loading Banner */}
       {loading && (
-        <div className="panel p-4 mb-4 flex items-center justify-center gap-2.5 bg-slate-900/90 border border-slate-800 rounded-lg shadow-sm">
-          <RefreshCw className="w-4 h-4 text-cyan-400 animate-spin" />
-          <span className="text-xs text-cyan-400 font-medium">
-            Analyzing email headers, tracing route hops, running Python AI engine, and validating authentication...
+        <div className="panel p-4 mb-4 flex items-center justify-center gap-2.5 bg-blue-50 border border-blue-200 rounded-lg shadow-sm">
+          <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />
+          <span className="text-xs text-blue-800 font-medium">
+            Analyzing email headers, tracing route hops, running AI threat engine, and validating authentication...
           </span>
         </div>
       )}
@@ -218,8 +218,8 @@ export function App() {
             />
           </div>
 
-          {/* Threat Correlation & Campaign Graph */}
-          <ThreatGraphView graph={report.graph} />
+          {/* Threat Correlation & Identity Attribution */}
+          <ThreatGraphView graph={report.graph} report={report} />
 
           {/* Deep Inspection Tabs (Auth, NLP, IOCs, Headers, Custody) */}
           <ForensicsTabs report={report} privacyMode={privacyMode} />
@@ -227,11 +227,11 @@ export function App() {
       )}
 
       {/* Footer Legal & Forensic Attribution Notice */}
-      <footer className="mt-8 py-5 border-t border-slate-800 text-center text-xs text-slate-500">
-        <p>
-          AEGIS-MAIL FORENSICS PLATFORM • Built with Node.js (JavaScript) + Python AI Engine & TailwindCSS
+      <footer className="mt-8 py-5 border-t border-slate-200 text-center text-xs text-slate-500">
+        <p className="font-semibold text-slate-700">
+          AI-POWERED EMAIL THREAT DETECTION, GEOLOCATION & FORENSIC INTELLIGENCE PLATFORM (PROBLEM STATEMENT 7)
         </p>
-        <p className="mt-1 text-[11px] text-slate-600">
+        <p className="mt-1 text-[11px] text-slate-500">
           Origin geolocation indicates technical mail transfer agent/relay infrastructure, not verified human physical location.
         </p>
       </footer>

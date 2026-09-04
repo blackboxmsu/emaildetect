@@ -3,39 +3,43 @@
 @tailwind utilities;
 
 :root {
-  --bg-page: #0b0f19;
-  --bg-surface: #111827;
-  --bg-surface-elevated: #1f2937;
-  --bg-subtle: #1e293b;
+  --bg-page: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #ffffff;
+  --bg-subtle: #f1f5f9;
   
-  --border-color: #273549;
-  --border-hover: #3b82f6;
+  --border-color: #e2e8f0;
+  --border-hover: #cbd5e1;
 
   --color-primary: #2563eb;
   --color-primary-hover: #1d4ed8;
   
-  --color-danger: #ef4444;
-  --color-danger-bg: rgba(239, 68, 68, 0.12);
-  --color-danger-border: rgba(239, 68, 68, 0.35);
+  --color-danger: #dc2626;
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-danger-text: #b91c1c;
 
-  --color-warning: #f59e0b;
-  --color-warning-bg: rgba(245, 158, 11, 0.12);
-  --color-warning-border: rgba(245, 158, 11, 0.35);
+  --color-warning: #d97706;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fde68a;
+  --color-warning-text: #b45309;
 
-  --color-success: #10b981;
-  --color-success-bg: rgba(16, 185, 129, 0.12);
-  --color-success-border: rgba(16, 185, 129, 0.35);
+  --color-success: #16a34a;
+  --color-success-bg: #f0fdf4;
+  --color-success-border: #bbf7d0;
+  --color-success-text: #15803d;
 
-  --color-info: #3b82f6;
-  --color-info-bg: rgba(59, 130, 246, 0.12);
-  --color-info-border: rgba(59, 130, 246, 0.35);
+  --color-info: #2563eb;
+  --color-info-bg: #eff6ff;
+  --color-info-border: #bfdbfe;
+  --color-info-text: #1d4ed8;
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
   --text-muted: #64748b;
 
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-mono: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
 }
 
 * {
@@ -54,54 +58,50 @@ body {
   line-height: 1.5;
 }
 
-/* Clean Custom Scrollbar */
+/* Custom Clean Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-page);
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #273549;
+  background: #cbd5e1;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3b82f6;
+  background: #94a3b8;
 }
 
 .font-mono {
   font-family: var(--font-mono);
 }
 
-/* Clean Enterprise Cards */
+/* Clean Professional Cards */
 .panel {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  transition: border-color 0.15s ease;
-}
-
-.panel:hover {
-  border-color: #374151;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
 }
 
 .panel-interactive {
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .panel-interactive:hover {
-  border-color: var(--color-primary);
-  background: #141e30;
+  border-color: #93c5fd;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
 }
 
-/* Clean Professional Buttons */
+/* Buttons */
 .btn-primary {
   background: var(--color-primary);
   color: #ffffff;
   font-weight: 500;
-  padding: 7px 14px;
+  padding: 8px 16px;
   border-radius: 6px;
   border: 1px solid transparent;
   cursor: pointer;
@@ -117,11 +117,11 @@ body {
 }
 
 .btn-secondary {
-  background: #1e293b;
-  color: #e2e8f0;
-  border: 1px solid #334155;
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
   font-weight: 500;
-  padding: 7px 14px;
+  padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
   display: inline-flex;
@@ -132,15 +132,15 @@ body {
 }
 
 .btn-secondary:hover {
-  background: #273549;
-  border-color: #475569;
+  background: #f8fafc;
+  border-color: #94a3b8;
 }
 
-/* Simple Clean Badges */
+/* Badges */
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 3px 8px;
   border-radius: 4px;
   font-size: 11px;
@@ -150,51 +150,50 @@ body {
 
 .badge-critical {
   background: var(--color-danger-bg);
-  color: #f87171;
+  color: var(--color-danger-text);
   border: 1px solid var(--color-danger-border);
 }
 
 .badge-warning {
   background: var(--color-warning-bg);
-  color: #fbbf24;
+  color: var(--color-warning-text);
   border: 1px solid var(--color-warning-border);
 }
 
 .badge-safe {
   background: var(--color-success-bg);
-  color: #34d399;
+  color: var(--color-success-text);
   border: 1px solid var(--color-success-border);
 }
 
 .badge-info {
   background: var(--color-info-bg);
-  color: #60a5fa;
+  color: var(--color-info-text);
   border: 1px solid var(--color-info-border);
 }
 
 .badge-neutral {
-  background: #1e293b;
-  color: #94a3b8;
-  border: 1px solid #334155;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
 }
 
 /* Layout Container */
 .app-container {
-  max-width: 1380px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 16px 24px 40px;
+  padding: 16px 20px 48px;
 }
 
-/* Clean Map Container */
+/* Leaflet Map */
 .leaflet-container {
   width: 100%;
   height: 100%;
   border-radius: 6px;
-  background: #0f172a !important;
+  background: #e2e8f0 !important;
   z-index: 1 !important;
 }
 
-/* Ensure Leaflet controls never bleed above modals */
 .leaflet-pane {
   z-index: 10 !important;
 }
@@ -207,13 +206,13 @@ body {
 }
 
 .leaflet-popup-content-wrapper {
-  background: #111827 !important;
-  color: #f8fafc !important;
-  border: 1px solid #334155 !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
   border-radius: 6px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
 .leaflet-popup-tip {
-  background: #111827 !important;
+  background: #ffffff !important;
 }

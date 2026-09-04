@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Eye, EyeOff, Database, FolderArchive, PlusCircle, Activity } from 'lucide-react';
+import { ShieldCheck, Eye, EyeOff, FolderArchive, PlusCircle, Database } from 'lucide-react';
 
 export const Header = ({
   privacyMode,
@@ -11,73 +11,70 @@ export const Header = ({
   currentCaseId
 }) => {
   return (
-    <header className="panel p-3 px-5 mb-4 flex items-center justify-between flex-wrap gap-3.5 bg-slate-900/90 border border-slate-800 rounded-lg shadow-sm">
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center shadow-inner">
-          <Shield className="text-cyan-400 w-5 h-5" />
+    <header className="panel p-4 px-6 mb-5 flex items-center justify-between flex-wrap gap-4 bg-white border border-slate-200 rounded-lg shadow-sm">
+      <div className="flex items-center gap-3.5">
+        <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shadow-sm">
+          <ShieldCheck className="w-6 h-6" />
         </div>
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-base font-bold text-slate-100 m-0 tracking-wide">
-              AI Email Threat Forensics
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-lg font-bold text-slate-900 m-0 tracking-tight">
+              AI Email Threat Forensics & Intelligence
             </h1>
-            <span className="badge badge-info text-[10px] uppercase font-semibold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              P7 PLATFORM
+            <span className="badge badge-info text-[11px] font-semibold">
+              PS-7 PLATFORM
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Threat Detection • Protocol Verification (SPF/DKIM/DMARC) • Origin Geolocation • Attribution
+          <p className="text-xs text-slate-500 mt-0.5">
+            Phishing Detection • Email Header Analysis • Origin Geolocation • Identity Attribution
           </p>
         </div>
       </div>
 
       <div className="flex items-center gap-2.5 flex-wrap">
         {currentCaseId && (
-          <div className="badge font-mono badge-neutral text-xs py-1 px-2 flex items-center gap-1.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-            <Activity className="w-3 h-3 text-cyan-400 animate-pulse" />
-            {currentCaseId}
+          <div className="badge badge-neutral font-mono text-xs py-1.5 px-3">
+            Case: <strong>{currentCaseId}</strong>
           </div>
         )}
 
-        {/* Database Status indicator */}
+        {/* Database Status */}
         <div
-          className={`badge text-xs py-1 px-2.5 flex items-center gap-1.5 rounded border ${
-            dbStatus?.connected
-              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-              : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+          className={`badge text-xs py-1.5 px-3 ${
+            dbStatus?.connected ? 'badge-safe' : 'badge-warning'
           }`}
-          title={dbStatus?.connected ? "MongoDB connected" : "Using in-memory store. Set MONGODB_URI in backend/.env to connect MongoDB"}
+          title={dbStatus?.connected ? "MongoDB connected" : "Local Storage Mode"}
         >
           <Database className="w-3 h-3" />
-          {dbStatus?.connected ? 'MongoDB Connected' : 'In-Memory DB'}
+          {dbStatus?.connected ? 'Database Connected' : 'Local Mode'}
         </div>
 
-        {/* Privacy / PII Masking Toggle */}
+        {/* PII Masking Toggle */}
         <button
           onClick={onTogglePrivacy}
-          className="btn-secondary py-1 px-2.5 text-xs inline-flex items-center gap-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
-          title="Toggle PII Masking for sensitive data"
+          className={`btn-secondary py-1.5 px-3 text-xs ${privacyMode ? 'bg-amber-50 border-amber-300 text-amber-800' : ''}`}
+          title="Toggle PII Masking for privacy compliance"
         >
-          {privacyMode ? <EyeOff className="w-3.5 h-3.5 text-rose-400" /> : <Eye className="w-3.5 h-3.5 text-slate-400" />}
-          {privacyMode ? 'PII Masked' : 'Mask PII'}
+          {privacyMode ? <EyeOff className="w-3.5 h-3.5 text-amber-600" /> : <Eye className="w-3.5 h-3.5 text-slate-500" />}
+          {privacyMode ? 'PII Masked (Active)' : 'Mask Sensitive PII'}
         </button>
 
-        {/* Case History Button */}
+        {/* Case History */}
         <button
           onClick={onOpenHistory}
-          className="btn-secondary py-1 px-2.5 text-xs inline-flex items-center gap-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+          className="btn-secondary py-1.5 px-3 text-xs"
         >
-          <FolderArchive className="w-3.5 h-3.5 text-slate-400" />
-          Cases ({caseCount || 0})
+          <FolderArchive className="w-3.5 h-3.5 text-slate-500" />
+          Saved Cases ({caseCount || 0})
         </button>
 
-        {/* New Investigation Button */}
+        {/* Investigate / Select Email */}
         <button
           onClick={onOpenNewModal}
-          className="btn-primary py-1 px-3 text-xs inline-flex items-center gap-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white font-medium shadow-sm transition"
+          className="btn-primary py-1.5 px-3.5 text-xs shadow-sm"
         >
           <PlusCircle className="w-3.5 h-3.5" />
-          Investigate Email
+          Investigate / Load Email
         </button>
       </div>
     </header>

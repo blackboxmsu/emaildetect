@@ -1,196 +1,186 @@
-import React, { useState } from 'react';
-import { Network, Sparkles } from 'lucide-react';
+import React from 'react';
+import { Network, ShieldAlert, CheckCircle, AlertTriangle, Globe, Sparkles, Server, ArrowRight } from 'lucide-react';
 
-export const ThreatGraphView = ({ graph }) => {
-  const [selectedNode, setSelectedNode] = useState(null);
-  const { nodes = [], edges = [], campaignCluster } = graph || {};
+export const ThreatGraphView = ({ graph, report }) => {
+  const { campaignCluster } = graph || {};
+  const { risk, headers, earliestReliableGeo, parsedEmail, nlp, domainIntel } = report || {};
 
-  const getNodeColor = (type, risk) => {
-    if (type === 'CAMPAIGN') return '#ec4899';
-    if (risk === 'MALICIOUS') return '#ef4444';
-    if (risk === 'SUSPICIOUS') return '#f59e0b';
-    if (type === 'EMAIL') return '#2563eb';
-    if (type === 'IP') return '#0ea5e9';
-    if (type === 'DOMAIN') return '#8b5cf6';
-    if (type === 'URL') return '#f97316';
-    return '#64748b';
-  };
+  // P7 Flagging: Determine Attribution Category
+  const isSpoofed = headers?.replyToMismatch || headers?.returnPathMismatch || (report?.authentication?.spf?.status === 'FAIL' || report?.authentication?.dmarc?.status === 'FAIL');
+  const isAnonymized = earliestReliableGeo?.infraType === 'VPN_PROXY' || earliestReliableGeo?.infraType === 'TOR_EXIT' || earliestReliableGeo?.infraType === 'CLOUD_HOSTING';
+  const isCompromised = !isSpoofed && report?.authentication?.spf?.pass && report?.risk?.fraudScore > 40;
 
-  const width = 800;
-  const height = 360;
-  const centerX = width / 2;
-  const centerY = height / 2;
+  let attributionVerdict = 'Direct Malicious Actor Environment';
+  let verdictBadge = 'badge-critical';
+  let verdictDescription = 'Email originated directly from attacker-operated mail infrastructure.';
 
-  const nodePositions = {};
+  if (isSpoofed && isAnonymized) {
+    attributionVerdict = 'Spoofed Domain & Anonymized Infrastructure';
+    verdictBadge = 'badge-critical';
+    verdictDescription = 'Sender address was spoofed to mimic legitimate domain, transmitted through VPN/Proxy relay to hide attacker origin.';
+  } else if (isSpoofed) {
+    attributionVerdict = 'Spoofed Domain';
+    verdictBadge = 'badge-critical';
+    verdictDescription = 'Sender identity or domain header has been falsified without valid cryptographic SPF/DKIM authorization.';
+  } else if (isAnonymized) {
+    attributionVerdict = 'Anonymized Infrastructure (VPN / Proxy)';
+    verdictBadge = 'badge-warning';
+    verdictDescription = 'Transmitted via anonymized hosting or proxy gateway, obscuring the physical origin point.';
+  } else if (isCompromised) {
+    attributionVerdict = 'Compromised Legitimate Account';
+    verdictBadge = 'badge-warning';
+    verdictDescription = 'Email passes protocol authentication, indicating a valid corporate account that has likely been compromised.';
+  } else if ((risk?.fraudScore || 0) < 30) {
+    attributionVerdict = 'Legitimate Infrastructure';
+    verdictBadge = 'badge-safe';
+    verdictDescription = 'Email originated from authenticated, legitimate mail infrastructure matching domain policy.';
+  }
 
-  nodes.forEach((node, idx) => {
-    if (node.type === 'EMAIL') {
-      nodePositions[node.id] = { x: centerX, y: centerY };
-    } else if (node.type === 'CAMPAIGN') {
-      nodePositions[node.id] = { x: centerX, y: centerY - 120 };
-    } else {
-      const angle = (idx / Math.max(1, nodes.length - 1)) * 2 * Math.PI;
-      const radius = 120;
-      nodePositions[node.id] = {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle)
-      };
-    }
-  });
+  const fromAddr = parsedEmail?.from?.address || 'N/A';
+  const returnPath = parsedEmail?.returnPath || 'N/A';
+  const replyTo = parsedEmail?.replyTo?.address || fromAddr;
+  const originIp = headers?.earliestReliableIp || 'Internal Node';
 
   return (
-    <div className="panel p-5 mb-4 bg-slate-900/90 border border-slate-800 rounded-lg shadow-sm">
-      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+    <div className="panel p-5 mb-5 bg-white border border-slate-200 rounded-lg shadow-sm">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 flex-wrap gap-2">
         <div>
-          <h3 className="text-sm font-semibold text-slate-100 flex items-center gap-2 m-0">
-            <Network className="w-4 h-4 text-cyan-400" />
-            Threat Correlation & Attribution Graph
-          </h3>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Entity relationships connecting sender identity, lookalike domains, IPs, and linked campaigns.
+          <div className="flex items-center gap-2">
+            <Network className="w-5 h-5 text-blue-600" />
+            <h3 className="text-sm font-bold text-slate-900 m-0">
+              Identity Correlation & Attribution Intelligence
+            </h3>
+            <span className="badge badge-info text-[10px]">P7 Core Module</span>
+          </div>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Correlates sender domains, reply routing, origin IPs, and infrastructure attribution.
           </p>
         </div>
 
         {campaignCluster && (
-          <div className="badge badge-critical text-xs py-1 px-2.5 flex items-center gap-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/30 rounded">
-            <Sparkles className="w-3 h-3 text-rose-400" />
-            {campaignCluster.name} ({campaignCluster.confidence}% Match)
+          <div className="badge badge-warning text-xs py-1 px-3">
+            <Sparkles className="w-3.5 h-3.5" />
+            Linked Campaign: <strong>{campaignCluster.name}</strong> ({campaignCluster.confidence}% Match)
           </div>
         )}
       </div>
 
-      {/* SVG Container */}
-      <div className="w-full h-[360px] bg-slate-950/60 rounded-md border border-slate-800 relative overflow-hidden">
-        <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}>
-          <defs>
-            <marker id="arrow-simple" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569" />
-            </marker>
-          </defs>
-
-          {/* Edges */}
-          {edges.map((edge, idx) => {
-            const start = nodePositions[edge.from];
-            const end = nodePositions[edge.to];
-            if (!start || !end) return null;
-
-            const isMal = edge.risk === 'MALICIOUS';
-            const stroke = isMal ? '#ef4444' : '#334155';
-
-            const midX = (start.x + end.x) / 2;
-            const midY = (start.y + end.y) / 2;
-
-            return (
-              <g key={idx}>
-                <line
-                  x1={start.x}
-                  y1={start.y}
-                  x2={end.x}
-                  y2={end.y}
-                  stroke={stroke}
-                  strokeWidth={1.5}
-                  strokeDasharray={isMal ? '3, 3' : 'none'}
-                  markerEnd="url(#arrow-simple)"
-                />
-                <text
-                  x={midX}
-                  y={midY - 4}
-                  fill="#94a3b8"
-                  fontSize="9"
-                  fontFamily="var(--font-mono)"
-                  textAnchor="middle"
-                >
-                  {edge.label}
-                </text>
-              </g>
-            );
-          })}
-
-          {/* Nodes */}
-          {nodes.map(node => {
-            const pos = nodePositions[node.id];
-            if (!pos) return null;
-            const color = getNodeColor(node.type, node.risk);
-            const isSelected = selectedNode?.id === node.id;
-
-            return (
-              <g
-                key={node.id}
-                onClick={() => setSelectedNode(node)}
-                className="cursor-pointer"
-                transform={`translate(${pos.x}, ${pos.y})`}
-              >
-                <circle
-                  r={isSelected ? 20 : 16}
-                  fill="#111827"
-                  stroke={color}
-                  strokeWidth={isSelected ? 3 : 1.5}
-                />
-                <text
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fill={color}
-                  fontSize="10"
-                  fontWeight="bold"
-                  fontFamily="var(--font-mono)"
-                >
-                  {node.type.slice(0, 3)}
-                </text>
-                <text
-                  y={26}
-                  textAnchor="middle"
-                  fill="#e2e8f0"
-                  fontSize="10"
-                  fontFamily="var(--font-sans)"
-                >
-                  {node.label}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-
-        {/* Selected Node Details Box */}
-        {selectedNode && (
-          <div className="absolute bottom-2.5 right-2.5 bg-slate-900 border border-slate-700 rounded-md p-3 max-w-xs text-xs shadow-lg">
-            <div className="flex justify-between items-center mb-1">
-              <span className="badge badge-info text-[10px]">{selectedNode.type}</span>
-              <button
-                onClick={() => setSelectedNode(null)}
-                className="text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer text-xs"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="font-semibold text-slate-100 mb-1">{selectedNode.label}</div>
-            {selectedNode.details && (
-              <pre className="text-[10px] text-slate-400 font-mono m-0 overflow-auto max-h-24">
-                {JSON.stringify(selectedNode.details, null, 2)}
-              </pre>
-            )}
+      {/* Attribution Classification Banner (P7 Requirement) */}
+      <div className="p-3.5 px-4 bg-slate-50 border border-slate-200 rounded-lg mb-4 flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-3">
+          <div className="text-xs font-semibold text-slate-600">
+            Investigative Attribution Flag:
           </div>
-        )}
+          <span className={`badge text-xs py-1 px-2.5 font-bold ${verdictBadge}`}>
+            {attributionVerdict}
+          </span>
+        </div>
+
+        <div className="text-xs text-slate-600 flex items-center gap-1.5">
+          <span>Attribution Confidence:</span>
+          <strong className="text-blue-600 font-mono text-sm">{risk?.attributionConfidence || 70}%</strong>
+        </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex items-center gap-3.5 mt-2.5 text-[11px] text-slate-400 flex-wrap">
-        <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-          <span>Target Email</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-purple-500"></span>
-          <span>Sender Domain</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
-          <span>Relay IP</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-pink-500"></span>
-          <span>Campaign Cluster</span>
-        </div>
+      <p className="text-xs text-slate-600 -mt-2 mb-4">
+        {verdictDescription}
+      </p>
+
+      {/* Correlation Matrix Table: From vs Return-Path vs Reply-To vs IP */}
+      <div className="overflow-x-auto rounded-md border border-slate-200">
+        <table className="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr className="bg-slate-50 text-slate-600 border-b border-slate-200">
+              <th className="p-2.5 font-semibold">Entity Element</th>
+              <th className="p-2.5 font-semibold">Observed Header Value</th>
+              <th className="p-2.5 font-semibold">Correlation Status</th>
+              <th className="p-2.5 font-semibold">Forensic Finding</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {/* Sender From */}
+            <tr>
+              <td className="p-2.5 font-medium text-slate-900">Sender (From)</td>
+              <td className="p-2.5 font-mono text-slate-700">{fromAddr}</td>
+              <td className="p-2.5">
+                <span className="badge badge-neutral text-[10px]">Claimed Identity</span>
+              </td>
+              <td className="p-2.5 text-slate-600">
+                {nlp?.executiveImpersonation?.detected ? 'Impersonates VIP / Executive title' : 'Sender identity declared in header'}
+              </td>
+            </tr>
+
+            {/* Return Path */}
+            <tr>
+              <td className="p-2.5 font-medium text-slate-900">Return-Path</td>
+              <td className="p-2.5 font-mono text-slate-700">{returnPath}</td>
+              <td className="p-2.5">
+                {headers?.returnPathMismatch ? (
+                  <span className="badge badge-warning text-[10px]">Mismatch</span>
+                ) : (
+                  <span className="badge badge-safe text-[10px]">Aligned</span>
+                )}
+              </td>
+              <td className="p-2.5 text-slate-600">
+                {headers?.returnPathMismatch ? 'Bounce envelope domain does not match sender domain' : 'Properly aligned with sender'}
+              </td>
+            </tr>
+
+            {/* Reply-To */}
+            <tr>
+              <td className="p-2.5 font-medium text-slate-900">Reply-To Address</td>
+              <td className="p-2.5 font-mono text-slate-700">{replyTo}</td>
+              <td className="p-2.5">
+                {headers?.replyToMismatch ? (
+                  <span className="badge badge-critical text-[10px]">Diverted Route</span>
+                ) : (
+                  <span className="badge badge-safe text-[10px]">Matches Sender</span>
+                )}
+              </td>
+              <td className="p-2.5 text-slate-600">
+                {headers?.replyToMismatch 
+                  ? '⚠️ Responses routed away to attacker-controlled mailbox' 
+                  : 'Normal reply routing'}
+              </td>
+            </tr>
+
+            {/* Origin Server IP */}
+            <tr>
+              <td className="p-2.5 font-medium text-slate-900">Origin IP Node</td>
+              <td className="p-2.5 font-mono text-slate-700">
+                {originIp} ({earliestReliableGeo ? `${earliestReliableGeo.city}, ${earliestReliableGeo.country}` : 'Local Node'})
+              </td>
+              <td className="p-2.5">
+                {earliestReliableGeo?.infraType === 'VPN_PROXY' || earliestReliableGeo?.infraType === 'TOR_EXIT' ? (
+                  <span className="badge badge-warning text-[10px]">Proxy / VPN</span>
+                ) : (
+                  <span className="badge badge-info text-[10px]">Identified</span>
+                )}
+              </td>
+              <td className="p-2.5 text-slate-600">
+                {earliestReliableGeo?.isp || 'Standard Mail Gateway'} • {earliestReliableGeo?.infraType || 'Public Host'}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+
+      {/* Lookalike Domains & Threat Flags if present */}
+      {nlp?.lookalikeDomains && nlp.lookalikeDomains.length > 0 && (
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+          <div className="flex items-center gap-1.5 text-red-800 text-xs font-bold mb-1">
+            <ShieldAlert className="w-4 h-4 text-red-600" />
+            Deceptive Domain Squatting / Lookalike Detected:
+          </div>
+          <div className="flex flex-wrap gap-2 mt-1.5">
+            {nlp.lookalikeDomains.map((l, idx) => (
+              <span key={idx} className="badge badge-critical text-xs font-mono py-1 px-2.5">
+                {l.domain} ➔ Spoofs legitimate: <strong>{l.target}</strong> ({l.type})
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
